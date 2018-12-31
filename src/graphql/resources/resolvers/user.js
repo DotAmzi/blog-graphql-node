@@ -9,9 +9,6 @@ export default {
         return db.users
           .findAll({
             order: [[ 'id', 'DESC' ]],
-            where: {
-              'active': 'enabled'
-            },
             limit: first,
             offset: offset
           });
@@ -39,14 +36,11 @@ export default {
           return db.users
             .findOne({where: 
               {
-                $or: [
-                  {cpf: input.cpf},
-                  {email: input.email}
-                ]
+                email: input.email
               }
             })
             .then(user => {
-              if (user) throw new Error('User with cpf or email has been created!');
+              if (user) throw new Error(`User with email ${input.email} has been created!`);
               return db.users
                 .create(input, {transaction: t});
             });
@@ -54,7 +48,6 @@ export default {
       },
   
       updateUser: (parent, {input}, {db, user}, info) => {
-        const cpf = input.cpf ? input.cpf : null;
         const email = input.email ? input.email : null;
   
         return db.sequelize.transaction((t) => {
@@ -65,13 +58,12 @@ export default {
                   $ne: user.id
                 },
                 $or: [
-                  {cpf},
                   {email}
                 ]
               }
             })
             .then(userQuery => {
-              if (userQuery) throw new Error('CPF or Email already registered');
+              if (userQuery) throw new Error(`Email ${input.email} already registered`);
               return db.users.findByPk(user.id);
             })
             .then(user => {
