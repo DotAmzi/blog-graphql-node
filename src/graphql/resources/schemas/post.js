@@ -11,12 +11,14 @@ export default `
     title: String!
     text: String!
     photo: String!
+    id_tag: ID!
   }
 
   input PostUpdateInput {
     title: String
     text: String
     photo: String
+    id_tag: ID
   }
 
   type Query {
