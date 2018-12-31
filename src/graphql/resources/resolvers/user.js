@@ -49,17 +49,15 @@ export default {
   
       updateUser: (parent, {input}, {db, user}, info) => {
         const email = input.email ? input.email : null;
-  
+        const Op = db.Sequelize.Op;
         return db.sequelize.transaction((t) => {
           return db.users
             .findOne({
               where: {
                 id: {
-                  $ne: user.id
+                  [Op.ne]: user.id
                 },
-                $or: [
-                  {email}
-                ]
+                email
               }
             })
             .then(userQuery => {

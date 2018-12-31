@@ -67,7 +67,6 @@ describe("Update User test", done => {
         `
       })
       .end((err, res) => {
-        console.log(res.body)
         res.body.should.be.json;
         res.body.data.updateUser.name.should.equal('testing');
         done();
@@ -190,6 +189,30 @@ describe("Update User test", done => {
       .end((err, res) => {
         res.body.should.be.json;
         res.body.data.updateUserPassword.should.equal(true);
+        done();
+      });
+  });
+
+  it("should not be a update user without token", done => {
+    request
+      .post('/graphql')
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .send({
+        "query": `
+        mutation{
+          updateUser(input: {
+            email: "testAuth@test.com"
+          }){
+            email
+          }
+        }
+        `
+      })
+      .end((err, res) => {
+        res.body.should.be.json;
+        res.res.statusMessage.should.equal('Token Invalid');
+        res.status.should.equal(401);
         done();
       });
   });
