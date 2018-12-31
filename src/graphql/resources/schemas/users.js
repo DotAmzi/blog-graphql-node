@@ -13,7 +13,7 @@ export default `
     name: String!
     email: Email!
     password: String!
-    photo: String!
+    photo: String
   }
 
   input UserUpdateInput {
