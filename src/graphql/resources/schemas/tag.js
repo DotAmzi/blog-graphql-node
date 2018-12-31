@@ -18,8 +18,6 @@ export default `
     tags(first: Int, offset: Int): [ Tag! ]!
     # Get single tag
     tag(id: ID!): Tag
-    # Get current tag data
-    currentTag: Tag
   }
 
   type Mutation {

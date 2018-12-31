@@ -44,9 +44,9 @@ export default {
   
       updateTag: (parent, {input, id}, {db, user}, info) => {
         return db.sequelize.transaction((t) => {
-          return db.tags.findByPk(user.id)
+          return db.tags.findByPk(id)
             .then(tag => {
-              if (!tag) throw new Error(`Tag with id ${input.id} has been created!`);
+              if (!tag) throw new Error(`Tag with id ${id} not exist!`);
               return tag.update(input, {t});
             });
         });
