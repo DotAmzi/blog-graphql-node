@@ -3,6 +3,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import { ApolloServer } from 'apollo-server-express';
 import db from './db/models';
+import { verifyToken } from './middlewares/jwt';
 import {typeDefs, resolvers} from './graphql/schema';
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,6 +35,7 @@ const apollo = new ApolloServer({
   }
 });
 
+app.use(pathUrl, verifyToken);
 apollo.applyMiddleware({ app, pathUrl });
 
 let server = app.listen(PORT || 3000, () => {
