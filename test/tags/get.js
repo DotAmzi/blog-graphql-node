@@ -31,10 +31,10 @@ describe("Get Tag test", done => {
         return db.users.create(newUser);
       })
       .then(() => {
-        return db.tags.crate(newTag1);
+        return db.tags.create(newTag1);
       })
       .then(() => {
-        return db.tags.crate(newTag2);
+        return db.tags.create(newTag2);
       })
       .catch(err => {
         console.log('Insert error');
@@ -89,7 +89,7 @@ describe("Get Tag test", done => {
       .send({
         "query": `
         query{
-          tag(id: 1){
+          tag(id: 4){
             name
           }
         }
@@ -97,7 +97,7 @@ describe("Get Tag test", done => {
       })
       .end((err, res) => {
         res.body.should.be.json;
-        res.body.errors[0].message.should.equal('Name has been registred on another tag');
+        res.body.errors[0].message.should.equal('Tag not found');
         done();
       });
   });
@@ -119,12 +119,12 @@ describe("Get Tag test", done => {
       })
       .end((err, res) => {
         res.body.should.be.json;
-        res.body.data.tags[0].name.should.equal('tag name');
+        res.body.data.tags[0].name.should.equal('tag name 2');
         done();
       });
   });
 
-  it("should not update user without token", done => {
+  it("should not get tag without token", done => {
     request
       .post('/graphql')
       .set('Content-Type', 'application/json')

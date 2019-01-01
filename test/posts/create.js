@@ -5,7 +5,7 @@ var request = require("supertest").agent(server);
 var db = require('../../dist/db/models');
 let tokenGenerate = '';
 
-describe("Create Tag test", done => {
+describe("Create Post test", done => {
 
   before(done => {
     var newUser = {
@@ -18,9 +18,16 @@ describe("Create Tag test", done => {
       active: 'enabled'
     }
 
+    var newTag1 = {
+      name: "tag name"
+    }
+
     db.sequelize.sync({force: true})
       .then(()=> {
         return db.users.create(newUser);
+      })
+      .then(() => {
+        return db.tags.create(newTag1);
       })
       .catch(err => {
         console.log('Insert error');
@@ -44,7 +51,7 @@ describe("Create Tag test", done => {
       });
   });
 
-  it("should be a create tag with success", done => {
+  it("should a create post with success", done => {
     request
       .post('/graphql')
       .set('Content-Type', 'application/json')
@@ -53,22 +60,25 @@ describe("Create Tag test", done => {
       .send({
         "query": `
         mutation{
-          createTag(input: {
-            name: "whatever"
+          createPost(input: {
+            title: "whatever title"
+            text: "whatever text"
+            photo: "whatever photo"
+            id_tag: 1
           }){
-            name
+            title
           }
         }
         `
       })
       .end((err, res) => {
         res.body.should.be.json;
-        res.body.data.createTag.name.should.equal('whatever');
+        res.body.data.createPost.title.should.equal('whatever title');
         done();
       });
   });
 
-  it("should not be a create tag when has been created", done => {
+  it("should not create post when has been created", done => {
     request
       .post('/graphql')
       .set('Content-Type', 'application/json')
@@ -77,22 +87,25 @@ describe("Create Tag test", done => {
       .send({
         "query": `
         mutation{
-          createTag(input: {
-            name: "whatever"
+          createPost(input: {
+            title: "whatever title"
+            text: "whatever text"
+            photo: "whatever photo"
+            id_tag: 1
           }){
-            name
+            title
           }
         }
       `
       })
       .end((err, res) => {
         res.body.should.be.json;
-        res.body.errors[0].message.should.equal('Tag with name whatever has been created!');
+        res.body.errors[0].message.should.equal('Post with title whatever title has been created!');
         done();
       });
   });
 
-  it("should not be a create tag without token", done => {
+  it("should not be a create ṕost without token", done => {
     request
       .post('/graphql')
       .set('Content-Type', 'application/json')
@@ -100,10 +113,13 @@ describe("Create Tag test", done => {
       .send({
         "query": `
         mutation{
-          createTag(input: {
-            name: "whatever 2"
+          createPost(input: {
+            title: "whatever title 2"
+            text: "whatever text"
+            photo: "whatever photo"
+            id_tag: 1
           }){
-            name
+            title
           }
         }
         `

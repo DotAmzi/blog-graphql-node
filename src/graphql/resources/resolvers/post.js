@@ -43,12 +43,25 @@ export default {
       },
   
       updatePost: (parent, {input, id}, {db, user}, info) => {
+        const titleValue = input.title ? input.title : null;
+        const Op = db.Sequelize.Op;
         return db.sequelize.transaction((t) => {
-          return db.posts.findByPk(id)
-            .then(post => {
-              if (!post) throw new Error(`Post with id ${id} not exist!`);
-              return post.update(input, {t});
-            });
+          return db.posts.findOne({
+            where: {
+              title: titleValue,
+              id: {
+                [Op.ne]: id
+              }
+            }
+          })
+          .then(existValue => {
+            if (existValue) throw new Error(`Title registred on another post!`);
+            return db.posts.findByPk(id);
+          })
+          .then(post => {
+            if (!post) throw new Error(`Post with id ${id} not exist!`);
+            return post.update(input, {t});
+          });
         });
       }
   

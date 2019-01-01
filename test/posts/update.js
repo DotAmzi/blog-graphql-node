@@ -5,7 +5,7 @@ var request = require("supertest").agent(server);
 var db = require('../../dist/db/models');
 let tokenGenerate = '';
 
-describe("Update Tag test", done => {
+describe("Update Post test", done => {
 
   before(done => {
     var newUser = {
@@ -22,8 +22,18 @@ describe("Update Tag test", done => {
       name: "tag name"
     }
 
-    var newTag2 = {
-      name: "tag name 2"
+    var newPost1 = {
+      title: "whatever title",
+      text: "whatever text",
+      photo: "whatever photo",
+      id_tag: 1
+    }
+
+    var newPost2 = {
+      title: "whatever title 2",
+      text: "whatever text",
+      photo: "whatever photo",
+      id_tag: 1
     }
 
     db.sequelize.sync({force: true})
@@ -34,7 +44,10 @@ describe("Update Tag test", done => {
         return db.tags.create(newTag1);
       })
       .then(() => {
-        return db.tags.create(newTag2);
+        return db.posts.create(newPost1);
+      })
+      .then(() => {
+        return db.posts.create(newPost2);
       })
       .catch(err => {
         console.log('Insert error');
@@ -58,7 +71,7 @@ describe("Update Tag test", done => {
       });
   });
 
-  it("should update tag with success", done => {
+  it("should update post with success", done => {
     request
       .post('/graphql')
       .set('Content-Type', 'application/json')
@@ -67,22 +80,22 @@ describe("Update Tag test", done => {
       .send({
         "query": `
         mutation{
-          updateTag(input: {
-            name: "another name"
+          updatePost(input: {
+            title: "another title"
           }, id: 1){
-            name
+            title
           }
         }
         `
       })
       .end((err, res) => {
         res.body.should.be.json;
-        res.body.data.updateTag.name.should.equal('another name');
+        res.body.data.updatePost.title.should.equal('another title');
         done();
       });
   });
 
-  it("should update tag name with same value", done => {
+  it("should update post title with same value", done => {
     request
       .post('/graphql')
       .set('Content-Type', 'application/json')
@@ -91,22 +104,22 @@ describe("Update Tag test", done => {
       .send({
         "query": `
         mutation{
-          updateTag(input: {
-            name: "another name"
+          updatePost(input: {
+            title: "another title"
           }, id: 1){
-            name
+            title
           }
         }
       `
       })
       .end((err, res) => {
         res.body.should.be.json;
-        res.body.data.updateTag.name.should.equal('another name');
+        res.body.data.updatePost.title.should.equal('another title');
         done();
       });
   });
 
-  it("should not update tag name with same value from another tag", done => {
+  it("should not update post name with same value from another post", done => {
     request
       .post('/graphql')
       .set('Content-Type', 'application/json')
@@ -115,22 +128,22 @@ describe("Update Tag test", done => {
       .send({
         "query": `
         mutation{
-          updateTag(input: {
-            name: "tag name 2"
+          updatePost(input: {
+            title: "whatever title 2"
           }, id: 1){
-            name
+            title
           }
         }
       `
       })
       .end((err, res) => {
         res.body.should.be.json;
-        res.body.errors[0].message.should.equal('Name has been registred on another tag');
+        res.body.errors[0].message.should.equal('Title registred on another post!');
         done();
       });
   });
 
-  it("should not update tag name with id wrong", done => {
+  it("should not update post name with id wrong", done => {
     request
       .post('/graphql')
       .set('Content-Type', 'application/json')
@@ -139,22 +152,22 @@ describe("Update Tag test", done => {
       .send({
         "query": `
         mutation{
-          updateTag(input: {
-            name: "another name 5"
-          }, id: 3){
-            name
+          updatePost(input: {
+            title: "whatever title"
+          }, id: 9){
+            title
           }
         }
       `
       })
       .end((err, res) => {
         res.body.should.be.json;
-        res.body.errors[0].message.should.equal('Tag with id 3 not exist!');
+        res.body.errors[0].message.should.equal('Post with id 9 not exist!');
         done();
       });
   });
 
-  it("should not update tag without token", done => {
+  it("should not update post without token", done => {
     request
       .post('/graphql')
       .set('Content-Type', 'application/json')
@@ -162,10 +175,10 @@ describe("Update Tag test", done => {
       .send({
         "query": `
         mutation{
-          updateTag(input: {
-            name: "another name 5"
-          }, id: 3){
-            name
+          updatePost(input: {
+            title: "whatever title 2"
+          }, id: 1){
+            title
           }
         }
         `
