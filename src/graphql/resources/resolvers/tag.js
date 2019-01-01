@@ -43,13 +43,26 @@ export default {
       },
   
       updateTag: (parent, {input, id}, {db, user}, info) => {
+        const nameValue = input.name ? input.name : null;
+        const Op = db.Sequelize.Op;
         return db.sequelize.transaction((t) => {
-          return db.tags.findByPk(id)
-            .then(tag => {
-              if (!tag) throw new Error(`Tag with id ${id} not exist!`);
-              return tag.update(input, {t});
-            });
-        });
+          return db.tags.findOne({
+            where: {
+              name: nameValue,
+              id: {
+                [Op.ne]: id
+              }
+            }
+          })
+          .then(tagExist => {
+            if (tagExist) throw new Error(`Name has been registred on another tag`);
+            return db.tags.findByPk(id)
+          })
+          .then(tag => {
+            if (!tag) throw new Error(`Tag with id ${id} not exist!`);
+            return tag.update(input, {t});
+          });
+        })
       }
   
     }
