@@ -2,18 +2,16 @@ export default `
 
   type Comment {
     id: ID!
+    comment: String!
   }
 
   input CommentCreateInput {
     comment: String!
     id_post: ID!
-    id_user: ID!
   }
 
   input CommentUpdateInput {
     comment: String!
-    id_post: ID!
-    id_user: ID!
   }
 
   type Query {
