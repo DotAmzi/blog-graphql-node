@@ -143,6 +143,30 @@ describe("Update Post test", done => {
       });
   });
 
+  it("should not update post name with id tag wrong", done => {
+    request
+      .post('/graphql')
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .set('Authorization', `Bearer ${tokenGenerate}`)
+      .send({
+        "query": `
+        mutation{
+          updatePost(input: {
+            id_tag: 2
+          }, id: 1){
+            title
+          }
+        }
+      `
+      })
+      .end((err, res) => {
+        res.body.should.be.json;
+        res.body.errors[0].message.should.equal('Tag with id 2 has not been created!');
+        done();
+      });
+  });
+
   it("should not update post name with id wrong", done => {
     request
       .post('/graphql')

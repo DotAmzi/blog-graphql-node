@@ -28,11 +28,16 @@ export default {
     Mutation: {
       createPost: (parent, {input}, {db, user}, info) => {
         return db.sequelize.transaction((t) => {
-          return db.posts
-            .findOne({where: 
-              {
-                title: input.title
-              }
+          return db.tags
+            .findByPk(input.id_tag)
+            .then(tag => {
+              if (!tag) throw new Error(`Tag with id ${input.id_tag} has not been created!`);
+              return db.posts
+                .findOne({where: 
+                  {
+                    title: input.title
+                  }
+                });
             })
             .then(post => {
               if (post) throw new Error(`Post with title ${input.title} has been created!`);
@@ -60,7 +65,17 @@ export default {
           })
           .then(post => {
             if (!post) throw new Error(`Post with id ${id} not exist!`);
-            return post.update(input, {t});
+            input.id_tag = input.id_tag ? input.id_tag : post.id_tag;
+            return db.tags.findByPk(input.id_tag)
+              .then(tag => {
+                return {
+                  post, tag
+                }
+              });
+          })
+          .then(postTag => {
+            if (!postTag.tag) throw new Error(`Tag with id ${input.id_tag} has not been created!`);
+            return postTag.post.update(input, {t});
           });
         });
       }
