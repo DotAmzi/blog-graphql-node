@@ -1,7 +1,19 @@
 export default {
 
     User: {
+      posts: (user, args, {db}, info) => {
+        return db.posts
+          .findAll({where: {
+            id_user: user.id
+          }});
+      },
 
+      comments: (user, args, {db}, info) => {
+        return db.comments
+          .findAll({where: {
+            id_user: user.id
+          }});
+      }
     },
     
     Query: {

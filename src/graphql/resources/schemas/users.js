@@ -6,6 +6,8 @@ export default `
     email: Email!
     password: String!
     photo: String!
+    posts: [Post!]
+    comments: [Comment!]
   }
 
 
