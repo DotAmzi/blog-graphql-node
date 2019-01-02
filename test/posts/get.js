@@ -26,7 +26,14 @@ describe("Get Post test", done => {
       title: "whatever title",
       text: "whatever text",
       photo: "whatever photo",
-      id_tag: 1
+      id_tag: 1,
+      id_user: 1
+    }
+
+    var newComment = {
+      comment: "comment whatever",
+      id_post: 1,
+      id_user: 1
     }
 
     db.sequelize.sync({force: true})
@@ -38,6 +45,9 @@ describe("Get Post test", done => {
       })
       .then(() => {
         return db.posts.create(newPost);
+      })
+      .then(() => {
+        return db.comments.create(newComment);
       })
       .catch(err => {
         console.log('Insert error');
@@ -147,6 +157,81 @@ describe("Get Post test", done => {
         res.status.should.equal(401);
         done();
       });
+  });
+
+
+  describe("fragments from comments", done => {
+    it("should get comments from post", done => {
+      request
+        .post('/graphql')
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${tokenGenerate}`)
+        .send({
+          "query": `
+          query{
+            post(id: 1){
+              comments{
+                comment
+              }
+            }
+          }
+          `
+        })
+        .end((err, res) => {
+          res.body.should.be.json;
+          res.body.data.post.comments[0].comment.should.equal('comment whatever');
+          done();
+        });
+    });
+
+    it("should get tag from post", done => {
+      request
+        .post('/graphql')
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${tokenGenerate}`)
+        .send({
+          "query": `
+          query{
+            post(id: 1){
+              tag{
+                name
+              }
+            }
+          }
+          `
+        })
+        .end((err, res) => {
+          res.body.should.be.json;
+          res.body.data.post.tag.name.should.equal('tag name');
+          done();
+        });
+    });
+
+    it("should get user from post", done => {
+      request
+        .post('/graphql')
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${tokenGenerate}`)
+        .send({
+          "query": `
+          query{
+            post(id: 1){
+              user{
+                name
+              }
+            }
+          }
+          `
+        })
+        .end((err, res) => {
+          res.body.should.be.json;
+          res.body.data.post.user.name.should.equal('User');
+          done();
+        });
+    });
   });
 
 });

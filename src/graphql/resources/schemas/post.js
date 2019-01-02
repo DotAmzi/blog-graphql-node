@@ -5,6 +5,9 @@ export default `
     title: String!
     text: String!
     photo: String!
+    user: User!
+    tag: Tag!
+    comments: [Comment!]
   }
 
   input PostCreateInput {
