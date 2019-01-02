@@ -1,7 +1,13 @@
 export default {
 
-    User: {
-
+    Tag: {
+      posts: (tag, args, {db}, parent) => {
+        return db.posts.findAll({
+          where: {
+            id_tag: tag.id
+          }
+        });
+      }
     },
     
     Query: {

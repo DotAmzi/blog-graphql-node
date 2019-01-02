@@ -26,6 +26,14 @@ describe("Get Tag test", done => {
       name: "tag name 2"
     }
 
+    var newPost = {
+      title: "whatever title",
+      text: "whatever text",
+      photo: "whatever photo",
+      id_tag: 1,
+      id_user: 1
+    }
+
     db.sequelize.sync({force: true})
       .then(()=> {
         return db.users.create(newUser);
@@ -35,6 +43,9 @@ describe("Get Tag test", done => {
       })
       .then(() => {
         return db.tags.create(newTag2);
+      })
+      .then(() => {
+        return db.posts.create(newPost);
       })
       .catch(err => {
         console.log('Insert error');
@@ -144,6 +155,32 @@ describe("Get Tag test", done => {
         res.status.should.equal(401);
         done();
       });
+  });
+
+  describe("fragments from tags", done => {
+    it("should posts from tags", done => {
+      request
+        .post('/graphql')
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${tokenGenerate}`)
+        .send({
+          "query": `
+          query{
+            tag(id: 1){
+              posts{
+                title
+              }
+            }
+          }
+          `
+        })
+        .end((err, res) => {
+          res.body.should.be.json;
+          res.body.data.tag.posts[0].title.should.equal('whatever title');
+          done();
+        });
+    });
   });
 
 });

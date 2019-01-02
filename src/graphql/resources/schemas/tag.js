@@ -3,6 +3,7 @@ export default `
   type Tag {
     id: ID!
     name: String!
+    posts: [Post!]
   }
 
   input TagCreateInput {
