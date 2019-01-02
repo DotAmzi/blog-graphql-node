@@ -26,7 +26,8 @@ describe("Get Comment test", done => {
       title: "whatever title",
       text: "whatever text",
       photo: "whatever photo",
-      id_tag: 1
+      id_tag: 1,
+      id_user: 1
     }
 
     var newComment = {
@@ -159,6 +160,56 @@ describe("Get Comment test", done => {
         res.status.should.equal(401);
         done();
       });
+  });
+
+  describe("fragments from comments", done => {
+    it("should get user from comment", done => {
+      request
+        .post('/graphql')
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${tokenGenerate}`)
+        .send({
+          "query": `
+          query{
+            comment(id: 1){
+              user{
+                name
+              }
+            }
+          }
+          `
+        })
+        .end((err, res) => {
+          res.body.should.be.json;
+          res.body.data.comment.user.name.should.equal('User');
+          done();
+        });
+    });
+
+    it("should get user from comment", done => {
+      request
+        .post('/graphql')
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${tokenGenerate}`)
+        .send({
+          "query": `
+          query{
+            comment(id: 1){
+              post{
+                title
+              }
+            }
+          }
+          `
+        })
+        .end((err, res) => {
+          res.body.should.be.json;
+          res.body.data.comment.post.title.should.equal('whatever title');
+          done();
+        });
+    });
   });
 
 });

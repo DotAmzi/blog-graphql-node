@@ -3,6 +3,8 @@ export default `
   type Comment {
     id: ID!
     comment: String!
+    user: User!
+    post: Post!
   }
 
   input CommentCreateInput {

@@ -1,7 +1,13 @@
 export default {
 
-    User: {
+    Comment: {
+      user: (comment, args, {db}, info) => {
+        return db.users.findByPk(comment.id_user);
+      },
 
+      post: (comment, args, {db}, info) => {
+        return db.posts.findByPk(comment.id_post);
+      }
     },
     
     Query: {
